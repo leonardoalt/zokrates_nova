@@ -2,7 +2,7 @@
 
 - [ZoKrates](zokrates.github.io/) is a toolbox for zkSNARKs on Ethereum. 
 - [Nova](https://github.com/microsoft/Nova) is a high-speed recursive SNARK.
-- ZoKrates is [adding support](https://github.com/Zokrates/ZoKrates/pull/1235) to Nova.
+- ZoKrates is [adding support](https://github.com/Zokrates/ZoKrates/pull/1235) for Nova.
 
 This repository contains examples of how to use ZoKrates to generate recursive
 SNARKs with Nova via the CLI and Rust. We also perform comparisons with other
@@ -24,7 +24,7 @@ The experiment is very preliminary and needs more features.
 
 To run the numbers yourself:
 
-1. Compile the ZoKrates `keccak` program for Nova (using the [Pallas](https://github.com/zcash/pasta) curve.
+1. Compile the ZoKrates `keccak` program for Nova (using the [Pallas](https://github.com/zcash/pasta)) curve.
 ```bash
 $ cd circuits/keccak_nova && make
 ```
