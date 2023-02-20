@@ -1,0 +1,34 @@
+import "hashes/keccak/256bit" as keccak;
+
+struct U256 {
+	u8[32] limbs;
+}
+
+def U256_from_u8(u8[32] bytes) -> U256 {
+	return U256 {
+		limbs: bytes
+	};
+}
+
+struct State<N> {
+	u32 idx;
+	U256[N] outputs;
+}
+
+struct HashInputs {
+	U256[2] words;
+}
+
+const u32 N_STEPS = 2;
+
+def main(State<N_STEPS> s, private HashInputs w) -> State<N_STEPS> {
+	U256[N_STEPS] mut tmp_outs = s.outputs;
+	tmp_outs[s.idx] = U256_from_u8(keccak(
+		[...w.words[0].limbs, ...w.words[1].limbs]
+	));
+	return State {
+		idx: s.idx + 1,
+		outputs: tmp_outs
+		
+	};
+}

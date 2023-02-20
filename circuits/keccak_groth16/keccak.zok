@@ -1,0 +1,21 @@
+import "hashes/keccak/256bit" as keccak;
+
+struct U256 {
+	u8[32] limbs;
+}
+
+def U256_from_u8(u8[32] bytes) -> U256 {
+	return U256 {
+		limbs: bytes
+	};
+}
+
+struct HashInputs {
+	U256[2] words;
+}
+
+def main(HashInputs w) -> U256 {
+	return U256_from_u8(keccak(
+		[...w.words[0].limbs, ...w.words[1].limbs]
+	));
+}
