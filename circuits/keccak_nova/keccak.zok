@@ -10,25 +10,18 @@ def U256_from_u8(u8[32] bytes) -> U256 {
 	};
 }
 
-struct State<N> {
-	u32 idx;
-	U256[N] outputs;
+struct State {
+	U256 acc;
 }
 
 struct HashInputs {
-	U256[2] words;
+	U256 word;
 }
 
-const u32 N_STEPS = 2;
-
-def main(State<N_STEPS> s, private HashInputs w) -> State<N_STEPS> {
-	U256[N_STEPS] mut tmp_outs = s.outputs;
-	tmp_outs[s.idx] = U256_from_u8(keccak(
-		[...w.words[0].limbs, ...w.words[1].limbs]
-	));
+def main(State s, private HashInputs w) -> State {
 	return State {
-		idx: s.idx + 1,
-		outputs: tmp_outs
-		
+		acc: U256_from_u8(keccak(
+			[...s.acc.limbs, ...w.word.limbs]
+		))
 	};
 }

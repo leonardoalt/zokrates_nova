@@ -45,6 +45,12 @@ By default the test runs a sequence of 2 hashes on each proof system.  If you
 want to change the length of the sequence, change `SEQ_LEN` in
 `keccak/src/lib.rs` and `N_STEPS` in `circuits/keccak_nova/keccak.zok`.
 
+4. To run the standalone example:
+```bash
+$ cargo run --release --example keccak -- --nocapture
+```
+
+
 TODO:
 
 - [ ] Generate input randomly

@@ -20,12 +20,9 @@ use std::io::{BufReader, Read};
 use std::path::Path;
 use std::time::Instant;
 
-const SEQ_LEN: usize = 2;
-
 #[derive(Serialize, Default, Clone, Debug)]
 pub struct State {
-    idx: U8Wrapper,
-    outputs: [U256; SEQ_LEN], // TODO this is the sequence length
+    acc: U256,
 }
 
 #[derive(Default, Copy, Clone, Debug)]
@@ -65,14 +62,12 @@ impl From<EthU256> for U256 {
 
 #[derive(Serialize, Clone, Copy, Debug)]
 pub struct HashInputs {
-    words: [U256; 2],
+    word: U256,
 }
 
 impl HashInputs {
-    pub fn new(x: EthU256, y: EthU256) -> Self {
-        Self {
-            words: [x.into(), y.into()],
-        }
+    pub fn new(x: EthU256) -> Self {
+        Self { word: x.into() }
     }
 }
 
@@ -90,7 +85,7 @@ impl CircuitInputGroth16 {
 pub struct Prover;
 
 impl Prover {
-    pub fn prove_nova(hash_input_seq: &[HashInputs; SEQ_LEN], dir: String) -> Result<(), String> {
+    pub fn prove_nova(hash_input_seq: &[HashInputs], dir: String) -> Result<(), String> {
         let circuit_file = format!("{dir}/out");
         let path = Path::new(&circuit_file);
         let file = File::open(path)
@@ -156,10 +151,7 @@ impl Prover {
         Ok(())
     }
 
-    pub fn prove_groth16(
-        hash_input_seq: &[HashInputs; SEQ_LEN],
-        dir: String,
-    ) -> Result<(), String> {
+    pub fn prove_groth16(hash_input_seq: &[HashInputs; 2], dir: String) -> Result<(), String> {
         let circuit_file = format!("{dir}/out");
         let path = Path::new(&circuit_file);
         let file = File::open(path)
@@ -241,7 +233,11 @@ impl Prover {
 
         let encoded = arguments.encode();
         let witness = interpreter
-            .execute_with_log_stream(prog, &encoded, &mut std::io::stdout())
+            .execute_with_log_stream(
+                prog.collect().to_ref_iterator(),
+                &encoded,
+                &mut std::io::stdout(),
+            )
             .map_err(|e| format!("Execution failed: {e}"))?;
 
         // Uncomment to see the witness verification result values
@@ -265,14 +261,24 @@ mod test {
 
     #[test]
     fn nova() {
-        let hash_inputs = [HashInputs::new(1.into(), 2.into()); SEQ_LEN];
+        let hash_inputs = [
+            HashInputs::new(0.into()),
+            HashInputs::new(0.into()),
+            HashInputs::new(0.into()),
+            HashInputs::new(0.into()),
+            HashInputs::new(0.into()),
+            HashInputs::new(0.into()),
+            HashInputs::new(0.into()),
+            HashInputs::new(0.into()),
+            HashInputs::new(0.into()),
+        ];
 
         Prover::prove_nova(&hash_inputs, "../circuits/keccak_nova".to_string()).unwrap();
     }
 
     #[test]
     fn groth16() {
-        let hash_inputs = [HashInputs::new(1.into(), 2.into()); SEQ_LEN];
+        let hash_inputs = [HashInputs::new(1.into()); 2];
 
         Prover::prove_groth16(&hash_inputs, "../circuits/keccak_groth16".to_string()).unwrap();
     }
